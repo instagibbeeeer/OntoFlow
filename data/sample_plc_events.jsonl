@@ -1,0 +1,2 @@
+{"machine_id":"M1","station_id":"S1","state":"running","power":1,"timestamp":"2026-09-30T10:05:00Z","source_system":"PLC"}
+{"machine_id":"M1","station_id":"S1","state":"fault","fault_code":"F42","timestamp":"2026-09-30T10:15:00Z","source_system":"PLC"}

@@ -1,0 +1,2 @@
+{"event_type":"order_start","order_id":"ORD-001","batch_id":"B123","machine_id":"M1","station_id":"S1","timestamp":"2026-09-30T10:00:00Z","source_system":"MES"}
+{"event_type":"order_complete","order_id":"ORD-001","batch_id":"B123","machine_id":"M1","station_id":"S1","timestamp":"2026-09-30T10:30:00Z","source_system":"MES"}

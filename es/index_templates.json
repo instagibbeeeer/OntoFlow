@@ -1,0 +1,22 @@
+{
+  "index_patterns": ["ontoflow_*"],
+  "template": {
+    "mappings": {
+      "properties": {
+        "dq_score": {"type": "float"},
+        "valid": {"type": "boolean"},
+        "timestamp": {"type": "date"},
+        "ingested_at": {"type": "date"},
+        "source": {"type": "keyword"},
+        "source_system": {"type": "keyword"},
+        "event_type": {"type": "keyword"},
+        "order_id": {"type": "keyword"},
+        "batch_id": {"type": "keyword"},
+        "machine_id": {"type": "keyword"},
+        "station_id": {"type": "keyword"},
+        "state": {"type": "keyword"},
+        "fault_code": {"type": "keyword"}
+      }
+    }
+  }
+}

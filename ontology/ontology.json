@@ -1,0 +1,31 @@
+{
+  "classes": [
+    "Machine",
+    "Station",
+    "Part",
+    "Batch",
+    "Order",
+    "QualityEvent",
+    "MaintenanceAction",
+    "Document"
+  ],
+  "relations": {
+    "QualityEvent": {
+      "requires": ["batch_id", "station_id"]
+    },
+    "Part": {
+      "required_fields": ["part_id", "revision", "material"]
+    },
+    "MaintenanceAction": {
+      "required_fields": ["machine_id", "action_type", "timestamp"]
+    }
+  },
+  "data_quality": {
+    "required_fields_global": ["source_system", "ingested_at"],
+    "score_weights": {
+      "completeness": 0.5,
+      "conformity": 0.3,
+      "recency": 0.2
+    }
+  }
+}
