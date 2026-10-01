@@ -1,31 +1,19 @@
 {
-  "classes": [
-    "Machine",
-    "Station",
-    "Part",
-    "Batch",
-    "Order",
-    "QualityEvent",
-    "MaintenanceAction",
-    "Document"
+  "classes": ["Machine", "Station", "Part", "Batch", "Order", "QualityEvent", "MaintenanceAction", "Document"],
+  "relationships": [
+    {"name": "runs_on", "from": "Batch", "to": "Machine"},
+    {"name": "belongs_to", "from": "Batch", "to": "Order"},
+    {"name": "affects", "from": "QualityEvent", "to": "Part"},
+    {"name": "reported_for", "from": "QualityEvent", "to": "Batch"}
   ],
-  "relations": {
-    "QualityEvent": {
-      "requires": ["batch_id", "station_id"]
+  "rules": {
+    "required_by_type": {
+      "production_event": ["event_id", "event_type", "machine_id", "timestamp", "source_system"],
+      "quality_event": ["event_id", "batch_id", "station_id", "severity", "timestamp", "source_system"],
+      "maintenance_action": ["event_id", "machine_id", "action_type", "timestamp", "source_system"],
+      "document": ["document_id", "title", "text", "source_system"]
     },
-    "Part": {
-      "required_fields": ["part_id", "revision", "material"]
-    },
-    "MaintenanceAction": {
-      "required_fields": ["machine_id", "action_type", "timestamp"]
-    }
+    "allowed_severity": ["low", "medium", "high", "critical"]
   },
-  "data_quality": {
-    "required_fields_global": ["source_system", "ingested_at"],
-    "score_weights": {
-      "completeness": 0.5,
-      "conformity": 0.3,
-      "recency": 0.2
-    }
-  }
+  "quality_weights": {"completeness": 0.5, "conformity": 0.3, "recency": 0.2}
 }

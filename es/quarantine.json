@@ -1,0 +1,1 @@
+{"mappings":{"properties":{"entity_type":{"type":"keyword"},"validation_reason":{"type":"text"},"source_system":{"type":"keyword"},"ingested_at":{"type":"date"},"dq_score":{"type":"float"}}}}
