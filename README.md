@@ -1,0 +1,1 @@
+Ontology-as-Code, event-driven data validation and indexing with SDK, API and RAG downstreams from an ontology language with the goal of turning it into a no code workflow creation platform. It turns messy data into structured, searchable, linked, and AI-ready information. 
