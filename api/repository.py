@@ -142,4 +142,32 @@ def hybrid_retrieve(query, dq_min=None, limit=6):
     docs=_rrf([bm_hits,vec_hits])[:limit]
     return {'documents':docs,'context':context}
 
+def _llm_answer(query,evidence):
+    key=os.getenv('LLM_API_KEY'); model=os.getenv('LLM_MODEL'); base=os.getenv('LLM_BASE_URL','https://api.openai.com/v1')
+    if not key or not model: return None
+    prompt=("Answer only from the supplied engineering evidence. Cite evidence using [E1], [E2], etc. "
+            "If evidence is insufficient, say so.\n\nQuestion: "+query+"\n\nEvidence:\n"+evidence)
+    r=requests.post(base.rstrip('/')+'/chat/completions',headers={'Authorization':f'Bearer {key}','Content-Type':'application/json'},json={'model':model,'messages':[{'role':'user','content':prompt}],'temperature':0},timeout=30)
+    r.raise_for_status(); return r.json()['choices'][0]['message']['content']
+
+
+def rag(query,dq_min=None,limit=6):
+    result=hybrid_retrieve(query,dq_min,limit); docs=result['documents']; context=result['context']
+    evidence=[]; citations=[]
+    for i,d in enumerate(docs,1):
+        evidence.append(f"[E{i}] {d.get('title','Untitled')}: {(d.get('text') or '')[:900]}")
+        citations.append({'id':d.get('document_id') or d['id'],'source':d.get('source_system'),'dq_score':d.get('dq_score'),'title':d.get('title')})
+    # Include linked ontology facts so RAG is not merely document BM25.
+    facts=[]
+    for o in context[:12]:
+        facts.append(f"{o.get('object_type')}: "+json.dumps({k:v for k,v in o.items() if k not in ('embedding','id') and v is not None},default=str))
+    all_evidence='\n'.join(facts+evidence)
+    if not docs and not context:
+        return {'answer':'No quality-approved ontology objects or documents matched the question.','citations':[],'context':[]}
+    answer=_llm_answer(query,all_evidence)
+    if not answer:
+        summary=' '.join((d.get('text') or d.get('title') or '')[:300] for d in docs[:3])
+        answer=f"Ontology context: {len(context)} related objects. Retrieved evidence: {summary}".strip()
+    return {'answer':answer,'citations':citations,'context':context}
+
 
