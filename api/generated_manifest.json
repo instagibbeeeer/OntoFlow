@@ -1,0 +1,362 @@
+{
+  "version": 1,
+  "objects": {
+    "Machine": {
+      "primary_key": "machine_id",
+      "index": "ontology_objects",
+      "properties": {
+        "machine_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "name": {
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        "status": {
+          "type": "enum",
+          "values": [
+            "running",
+            "idle",
+            "maintenance",
+            "offline"
+          ],
+          "required": true,
+          "keyword": true
+        },
+        "production_line": {
+          "type": "string",
+          "keyword": true
+        }
+      },
+      "searchable": [
+        "machine_id",
+        "name",
+        "status"
+      ]
+    },
+    "Part": {
+      "primary_key": "part_id",
+      "index": "ontology_objects",
+      "properties": {
+        "part_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "name": {
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        "revision": {
+          "type": "string",
+          "keyword": true
+        }
+      },
+      "searchable": [
+        "part_id",
+        "name"
+      ]
+    },
+    "Order": {
+      "primary_key": "order_id",
+      "index": "ontology_objects",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "product": {
+          "type": "string",
+          "searchable": true
+        },
+        "status": {
+          "type": "string",
+          "keyword": true
+        }
+      },
+      "searchable": [
+        "order_id",
+        "product"
+      ]
+    },
+    "Batch": {
+      "primary_key": "batch_id",
+      "index": "ontology_objects",
+      "properties": {
+        "batch_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "machine_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "order_id": {
+          "type": "string",
+          "keyword": true
+        },
+        "product": {
+          "type": "string",
+          "searchable": true
+        },
+        "started_at": {
+          "type": "datetime"
+        }
+      },
+      "searchable": [
+        "batch_id",
+        "product"
+      ]
+    },
+    "QualityFinding": {
+      "primary_key": "finding_id",
+      "index": "ontology_objects",
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "batch_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "part_id": {
+          "type": "string",
+          "keyword": true
+        },
+        "machine_id": {
+          "type": "string",
+          "keyword": true
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        "description": {
+          "type": "string",
+          "searchable": true
+        },
+        "severity": {
+          "type": "enum",
+          "values": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "required": true,
+          "keyword": true
+        },
+        "status": {
+          "type": "enum",
+          "values": [
+            "open",
+            "acknowledged",
+            "closed"
+          ],
+          "required": true,
+          "keyword": true
+        },
+        "timestamp": {
+          "type": "datetime",
+          "required": true
+        }
+      },
+      "searchable": [
+        "finding_id",
+        "title",
+        "description",
+        "severity"
+      ]
+    },
+    "MaintenanceAction": {
+      "primary_key": "maintenance_id",
+      "index": "ontology_objects",
+      "properties": {
+        "maintenance_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "machine_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "action_type": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "description": {
+          "type": "string",
+          "searchable": true
+        },
+        "timestamp": {
+          "type": "datetime",
+          "required": true
+        }
+      },
+      "searchable": [
+        "maintenance_id",
+        "action_type",
+        "description"
+      ]
+    },
+    "EngineeringDocument": {
+      "primary_key": "document_id",
+      "index": "documents",
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        "text": {
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        "machine_id": {
+          "type": "string",
+          "keyword": true
+        },
+        "batch_id": {
+          "type": "string",
+          "keyword": true
+        },
+        "part_id": {
+          "type": "string",
+          "keyword": true
+        },
+        "source_system": {
+          "type": "string",
+          "required": true,
+          "keyword": true
+        },
+        "dq_score": {
+          "type": "float",
+          "required": true
+        },
+        "valid": {
+          "type": "boolean",
+          "required": true
+        }
+      },
+      "searchable": [
+        "document_id",
+        "title",
+        "text"
+      ]
+    }
+  },
+  "links": {
+    "runs_on": {
+      "from": "Batch",
+      "to": "Machine",
+      "from_property": "machine_id",
+      "to_property": "machine_id",
+      "reverse_name": "batches"
+    },
+    "belongs_to": {
+      "from": "Batch",
+      "to": "Order",
+      "from_property": "order_id",
+      "to_property": "order_id",
+      "reverse_name": "batches"
+    },
+    "reported_for": {
+      "from": "QualityFinding",
+      "to": "Batch",
+      "from_property": "batch_id",
+      "to_property": "batch_id",
+      "reverse_name": "quality_findings"
+    },
+    "affects": {
+      "from": "QualityFinding",
+      "to": "Part",
+      "from_property": "part_id",
+      "to_property": "part_id",
+      "reverse_name": "quality_findings"
+    },
+    "finding_machine": {
+      "from": "QualityFinding",
+      "to": "Machine",
+      "from_property": "machine_id",
+      "to_property": "machine_id",
+      "reverse_name": "quality_findings"
+    },
+    "performed_on": {
+      "from": "MaintenanceAction",
+      "to": "Machine",
+      "from_property": "machine_id",
+      "to_property": "machine_id",
+      "reverse_name": "maintenance_actions"
+    },
+    "documents_batch": {
+      "from": "EngineeringDocument",
+      "to": "Batch",
+      "from_property": "batch_id",
+      "to_property": "batch_id",
+      "reverse_name": "documents"
+    },
+    "documents_machine": {
+      "from": "EngineeringDocument",
+      "to": "Machine",
+      "from_property": "machine_id",
+      "to_property": "machine_id",
+      "reverse_name": "documents"
+    }
+  },
+  "actions": {
+    "acknowledge_finding": {
+      "object": "QualityFinding",
+      "inputs": {
+        "user": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "set": {
+        "status": "acknowledged"
+      },
+      "audit": true
+    },
+    "close_finding": {
+      "object": "QualityFinding",
+      "inputs": {
+        "user": {
+          "type": "string",
+          "required": true
+        },
+        "resolution": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "set": {
+        "status": "closed"
+      },
+      "audit": true
+    }
+  },
+  "constraints": {
+    "default_dq_min": 0.7,
+    "rag_dq_min": 0.75
+  }
+}

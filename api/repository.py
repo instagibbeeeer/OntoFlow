@@ -15,7 +15,7 @@ def _source(hit):
 
 
 def _keyword_field(prop_spec, prop):
-    # searchable text properties get a .keyword subfield in generated mappings
+    # searchable text properties get a .keyword subfield to get a full match search
     return prop + '.keyword' if prop_spec.get('searchable') and not prop_spec.get('keyword') else prop
 
 
@@ -39,13 +39,13 @@ def query_objects(object_type, filters=None, limit=50):
 def traverse_link(source_type, source_id, link_name):
     source=get_object(source_type, source_id)
     if not source: return []
-    # forward
+    # >>>>>
     if link_name in LINKS and LINKS[link_name]['from']==source_type:
         link=LINKS[link_name]; value=source.get(link['from_property'])
         if value is None: return []
         target=link['to']; target_spec=object_spec(target)
         return query_objects(target,{link['to_property']:value})
-    # reverse
+    # <<<<<
     for canonical,link in LINKS.items():
         if link.get('reverse_name')==link_name and link['to']==source_type:
             value=source.get(link['to_property'])
