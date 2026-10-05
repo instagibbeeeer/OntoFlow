@@ -102,7 +102,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r api/requirements.txt
-          pip install requests kafka-python
+          python -m pip install requests kafka-python
 
       - name: Start Elasticsearch and API
         run: docker compose up -d --build elasticsearch elasticsearch-init api
