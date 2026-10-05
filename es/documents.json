@@ -1,1 +1,64 @@
-{"mappings":{"properties":{"document_id":{"type":"keyword"},"entity_type":{"type":"keyword"},"title":{"type":"text","fields":{"keyword":{"type":"keyword"}}},"text":{"type":"text"},"batch_id":{"type":"keyword"},"machine_id":{"type":"keyword"},"source_system":{"type":"keyword"},"source_version":{"type":"keyword"},"owner":{"type":"keyword"},"ingested_at":{"type":"date"},"dq_score":{"type":"float"},"valid":{"type":"boolean"},"source_hash":{"type":"keyword"}}}}
+{
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "object_type": {
+        "type": "keyword"
+      },
+      "dq_score": {
+        "type": "float"
+      },
+      "valid": {
+        "type": "boolean"
+      },
+      "source_system": {
+        "type": "keyword"
+      },
+      "source_hash": {
+        "type": "keyword"
+      },
+      "ingested_at": {
+        "type": "date"
+      },
+      "updated_at": {
+        "type": "date"
+      },
+      "document_id": {
+        "type": "keyword"
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "text": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "machine_id": {
+        "type": "keyword"
+      },
+      "batch_id": {
+        "type": "keyword"
+      },
+      "part_id": {
+        "type": "keyword"
+      },
+      "embedding": {
+        "type": "dense_vector",
+        "dims": 384,
+        "index": true,
+        "similarity": "cosine"
+      }
+    }
+  }
+}
