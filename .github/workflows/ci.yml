@@ -172,3 +172,18 @@ jobs:
       - name: Tear down E2E stack
         if: always()
         run: docker compose down -v --remove-orphan
+      - name: Elasticsearch init logs on failure
+        if: failure()
+        run: |
+          echo "=== Elasticsearch init logs ==="
+          docker compose logs elasticsearch-init || true
+
+          echo "=== Elasticsearch logs ==="
+          docker compose logs elasticsearch || true
+
+          echo "=== Container status ==="
+          docker compose ps -a || true
+
+          echo "=== Elasticsearch health ==="
+          docker compose exec -T elasticsearch \
+            curl -fsS http://localhost:9200/_cluster/health || true
