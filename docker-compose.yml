@@ -67,7 +67,8 @@ services:
       start_period: 30s
 
   elasticsearch-init:
-    image: curlimages/curl:8.10.1
+    build:
+      context: ./api
     restart: "no"
     networks: [ontoflow]
     depends_on:
@@ -75,20 +76,11 @@ services:
         condition: service_healthy
     volumes:
       - ./es:/es:ro
-    entrypoint: ["/bin/sh", "-ec"]
-    command: |
-      for name in ontology_objects documents quarantine action_audit; do
-        echo "Checking Elasticsearch index: $$name"
-        if curl -fsS "http://elasticsearch:9200/$$name" >/dev/null 2>&1; then
-          echo "Index $$name already exists"
-        else
-          echo "Creating index $$name"
-          curl --fail-with-body -sS --retry 5 --retry-delay 2 \
-            -X PUT "http://elasticsearch:9200/$$name" \
-            -H 'Content-Type: application/json' \
-            --data-binary "@/es/$$name.json"
-        fi
-      done
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ES_MAPPINGS_DIR: /es
+    command: ["python", "init_indices.py"]
+
 
   spark-stream:
     <<: *common
