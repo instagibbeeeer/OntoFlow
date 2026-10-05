@@ -78,10 +78,15 @@ services:
     entrypoint: ["/bin/sh", "-ec"]
     command: |
       for name in ontology_objects documents quarantine action_audit; do
-        code=$$(curl -sS -o /tmp/resp -w '%{http_code}' -X PUT "http://elasticsearch:9200/$$name" -H 'Content-Type: application/json' --data-binary "@/es/$$name.json")
-        if [ "$$code" != "200" ] && [ "$$code" != "400" ]; then
-          cat /tmp/resp
-          exit 1
+        echo "Checking Elasticsearch index: $$name"
+        if curl -fsS "http://elasticsearch:9200/$$name" >/dev/null 2>&1; then
+          echo "Index $$name already exists"
+        else
+          echo "Creating index $$name"
+          curl --fail-with-body -sS --retry 5 --retry-delay 2 \
+            -X PUT "http://elasticsearch:9200/$$name" \
+            -H 'Content-Type: application/json' \
+            --data-binary "@/es/$$name.json"
         fi
       done
 
