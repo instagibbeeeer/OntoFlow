@@ -1,0 +1,11 @@
+{
+  "mappings": {
+    "properties": {
+      "action": {"type":"keyword"},
+      "object_type": {"type":"keyword"},
+      "object_id": {"type":"keyword"},
+      "inputs": {"type":"object","enabled":true},
+      "timestamp": {"type":"date"}
+    }
+  }
+}

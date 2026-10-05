@@ -1,0 +1,103 @@
+{
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "object_type": {
+        "type": "keyword"
+      },
+      "dq_score": {
+        "type": "float"
+      },
+      "valid": {
+        "type": "boolean"
+      },
+      "source_system": {
+        "type": "keyword"
+      },
+      "source_hash": {
+        "type": "keyword"
+      },
+      "ingested_at": {
+        "type": "date"
+      },
+      "updated_at": {
+        "type": "date"
+      },
+      "machine_id": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "status": {
+        "type": "keyword"
+      },
+      "production_line": {
+        "type": "keyword"
+      },
+      "part_id": {
+        "type": "keyword"
+      },
+      "revision": {
+        "type": "keyword"
+      },
+      "order_id": {
+        "type": "keyword"
+      },
+      "product": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "batch_id": {
+        "type": "keyword"
+      },
+      "started_at": {
+        "type": "date"
+      },
+      "finding_id": {
+        "type": "keyword"
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "description": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "severity": {
+        "type": "keyword"
+      },
+      "timestamp": {
+        "type": "date"
+      },
+      "maintenance_id": {
+        "type": "keyword"
+      },
+      "action_type": {
+        "type": "keyword"
+      }
+    }
+  }
+}

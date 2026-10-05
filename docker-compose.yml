@@ -1,6 +1,14 @@
-services:
+name: ontoflow
 
+x-common: &common
+  restart: unless-stopped
+  init: true
+  networks:
+    - ontoflow
+
+services:
   kafka:
+    <<: *common
     image: apache/kafka:3.8.0
     hostname: kafka
     environment:
@@ -27,16 +35,11 @@ services:
       timeout: 5s
       retries: 12
       start_period: 20s
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    environment:
-      discovery.type: single-node
-      xpack.security.enabled: "false"
-      ES_JAVA_OPTS: -Xms1g -Xmx1g
-    ports: ["9200:9200"]
+
   kafka-init:
     image: apache/kafka:3.8.0
     restart: "no"
+    networks: [ontoflow]
     depends_on:
       kafka:
         condition: service_healthy
@@ -44,19 +47,110 @@ services:
     command: |
       /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:29092 --create --if-not-exists --topic raw.events --partitions 3 --replication-factor 1
       /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:29092 --create --if-not-exists --topic raw.documents --partitions 3 --replication-factor 1
-  spark-stream:
-    build: ./spark
-    depends_on: [kafka-init, elasticsearch]
+
+  elasticsearch:
+    <<: *common
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "${ES_JAVA_OPTS:--Xms1g -Xmx1g}"
+    ports:
+      - "${ELASTICSEARCH_PORT:-9200}:9200"
     volumes:
-      - ./spark:/app
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health?wait_for_status=yellow >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  elasticsearch-init:
+    image: curlimages/curl:8.10.1
+    restart: "no"
+    networks: [ontoflow]
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./es:/es:ro
+    entrypoint: ["/bin/sh", "-ec"]
+    command: |
+      for name in ontology_objects documents quarantine action_audit; do
+        code=$$(curl -sS -o /tmp/resp -w '%{http_code}' -X PUT "http://elasticsearch:9200/$$name" -H 'Content-Type: application/json' --data-binary "@/es/$$name.json")
+        if [ "$$code" != "200" ] && [ "$$code" != "400" ]; then
+          cat /tmp/resp
+          exit 1
+        fi
+      done
+
+  spark-stream:
+    <<: *common
+    build:
+      context: ./spark
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+      elasticsearch-init:
+        condition: service_completed_successfully
+    volumes:
       - ./ontology:/ontology:ro
       - spark-checkpoints:/checkpoints
-    command: ["spark-submit", "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.elasticsearch:elasticsearch-hadoop:8.11.0", "/app/stream_ingest.py"]
+      - delta-lake:/lakehouse
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      LAKEHOUSE_ROOT: /lakehouse
+      CHECKPOINT_ROOT: /checkpoints
+    command:
+      - spark-submit
+      - --packages
+      - org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,io.delta:delta-spark_2.12:3.2.0,org.elasticsearch:elasticsearch-hadoop:8.11.0
+      - --conf
+      - spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension
+      - --conf
+      - spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog
+      - /app/stream_ingest.py
+
   api:
-    build: ./api
-    depends_on: [elasticsearch]
-    ports: ["8000:8000"]
-    volumes: ["./api:/app"]
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    <<: *common
+    build:
+      context: ./api
+    depends_on:
+      elasticsearch-init:
+        condition: service_completed_successfully
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    ports:
+      - "${API_PORT:-8000}:8000"
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  embedding-worker:
+    <<: *common
+    build:
+      context: ./api
+    depends_on:
+      elasticsearch-init:
+        condition: service_completed_successfully
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      EMBEDDING_PROVIDER: "${EMBEDDING_PROVIDER:-hashing}"
+      EMBEDDING_POLL_SECONDS: "${EMBEDDING_POLL_SECONDS:-5}"
+    command: ["python", "embedding_worker.py"]
+
+networks:
+  ontoflow:
+    driver: bridge
+
 volumes:
+  kafka-data:
+  elasticsearch-data:
   spark-checkpoints:
+  delta-lake:
