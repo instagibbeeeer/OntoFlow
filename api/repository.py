@@ -4,6 +4,7 @@ import requests
 from elasticsearch import Elasticsearch
 from ontology_runtime import OBJECTS, LINKS, ACTIONS, CONSTRAINTS, object_spec
 from embeddings import get_embedder
+from google import genai
 
 ES_URL=os.getenv('ELASTICSEARCH_URL','http://elasticsearch:9200')
 es=Elasticsearch(ES_URL)
@@ -142,13 +143,32 @@ def hybrid_retrieve(query, dq_min=None, limit=6):
     docs=_rrf([bm_hits,vec_hits])[:limit]
     return {'documents':docs,'context':context}
 
-def _llm_answer(query,evidence):
-    key=os.getenv('LLM_API_KEY'); model=os.getenv('LLM_MODEL'); base=os.getenv('LLM_BASE_URL','https://api.openai.com/v1')
-    if not key or not model: return None
-    prompt=("Answer only from the supplied engineering evidence. Cite evidence using [E1], [E2], etc. "
-            "If evidence is insufficient, say so.\n\nQuestion: "+query+"\n\nEvidence:\n"+evidence)
-    r=requests.post(base.rstrip('/')+'/chat/completions',headers={'Authorization':f'Bearer {key}','Content-Type':'application/json'},json={'model':model,'messages':[{'role':'user','content':prompt}],'temperature':0},timeout=30)
-    r.raise_for_status(); return r.json()['choices'][0]['message']['content']
+
+
+
+def _llm_answer(query, evidence):
+    key = os.getenv("GEMINI_API_KEY")
+    model = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+
+    if not key:
+        return None
+
+    prompt = (
+        "Answer only from the supplied engineering evidence. "
+        "Cite evidence using [E1], [E2], etc. "
+        "If evidence is insufficient, say so.\n\n"
+        "Question: " + query +
+        "\n\nEvidence:\n" + evidence
+    )
+
+    client = genai.Client(api_key=key)
+
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt,
+    )
+
+    return response.text
 
 
 def rag(query,dq_min=None,limit=6):
