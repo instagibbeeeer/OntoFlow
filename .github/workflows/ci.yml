@@ -177,7 +177,7 @@ jobs:
         if: failure()
         run: |
           echo "=== Elasticsearch init logs ==="
-          docker compose logs elasticsearch-init || true
+          docker compose logs --no-color --tail=200 api
 
           echo "=== Elasticsearch logs ==="
           docker compose logs elasticsearch || true
