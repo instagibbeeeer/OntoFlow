@@ -193,12 +193,11 @@ def _upsert_gold(subset, object_type, spec):
     """Gold tables are current-state ontology tables keyed by each object's primary key."""
     pk = spec["primary_key"]
     table_path = f"{GOLD_ROOT}/{_safe_table_name(object_type)}"
-    gold_cols = ["object_type"] + list(spec["properties"].keys()) + [
-        "ingested_at",
-        "source_hash",
-        "dq_score",
-        "valid",
-    ]
+    gold_cols = list(dict.fromkeys(
+        ["object_type"]
+        + list(spec["properties"].keys())
+        + ["ingested_at", "source_hash", "dq_score", "valid"]
+    ))
     existing = [c for c in gold_cols if c in subset.columns]
     gold = subset.select(*existing).filter(col(pk).isNotNull()).dropDuplicates([pk])
 
