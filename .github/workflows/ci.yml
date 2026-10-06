@@ -180,8 +180,7 @@ jobs:
           docker compose logs --no-color --tail=200 api
 
           echo "=== Elasticsearch logs ==="
-          docker compose logs elasticsearch || true
-
+          docker compose logs --no-color --tail=200 kafka kafka-init
           echo "=== Container status ==="
           docker compose ps -a || true
 
