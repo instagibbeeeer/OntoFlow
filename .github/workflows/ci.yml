@@ -177,7 +177,7 @@ jobs:
         if: failure()
         run: |
           echo "=== Elasticsearch init logs ==="
-          docker compose logs --no-color --tail=200 api
+          docker compose logs --no-color --tail=400 spark-stream
 
           echo "=== Elasticsearch logs ==="
           docker compose logs --no-color --tail=200 kafka kafka-init
