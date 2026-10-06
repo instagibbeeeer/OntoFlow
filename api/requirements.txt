@@ -3,4 +3,6 @@ uvicorn[standard]==0.30.0
 strawberry-graphql==0.240.0
 pydantic==2.8.2
 elasticsearch==8.11.0
+graphql-core==3.2.5
+
 google-genai
