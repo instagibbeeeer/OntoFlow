@@ -263,7 +263,7 @@ def write_batch(df, epoch):
         "dq_score",
         "validation_errors",
         "source_hash",
-        "_raw_json",
+        col("_raw_json").alias("raw_json"),
         "topic",
         "kafka_partition",
         "kafka_offset",

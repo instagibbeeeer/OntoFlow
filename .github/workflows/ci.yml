@@ -168,22 +168,9 @@ jobs:
 
       - name: Service logs on failure
         if: failure()
-        run: docker compose logs --no-color kafka-init
+        run: docker compose logs --no-color spark-stream
 
       - name: Tear down E2E stack
         if: always()
         run: docker compose down -v --remove-orphans
-      - name: Elasticsearch init logs on failure
-        if: failure()
-        run: |
-          echo "=== Elasticsearch init logs ==="
-          docker compose logs --no-color --tail=400 spark-stream
 
-          echo "=== Elasticsearch logs ==="
-          docker compose logs --no-color --tail=200 kafka kafka-init
-          echo "=== Container status ==="
-          docker compose ps -a || true
-
-          echo "=== Elasticsearch health ==="
-          docker compose exec -T elasticsearch \
-            curl -fsS http://localhost:9200/_cluster/health || true
