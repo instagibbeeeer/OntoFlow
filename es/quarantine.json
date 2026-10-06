@@ -1,15 +1,15 @@
 {
   "mappings": {
     "properties": {
-      "object_type": {"type": "keyword"},
-      "validation_errors": {"type": "text"},
-      "ingested_at": {"type": "date"},
-      "dq_score": {"type": "float"},
-      "source_hash": {"type": "keyword"},
-      "raw_json": {"type": "text"},
-      "topic": {"type": "keyword"},
-      "kafka_partition": {"type": "integer"},
-      "kafka_offset": {"type": "long"}
+      "object_type": { "type": "keyword" },
+      "ingested_at": { "type": "date" },
+      "dq_score": { "type": "float" },
+      "validation_errors": { "type": "text" },
+      "source_hash": { "type": "keyword" },
+      "raw_json": { "type": "text" },
+      "topic": { "type": "keyword" },
+      "kafka_partition": { "type": "integer" },
+      "kafka_offset": { "type": "long" }
     }
   }
 }
