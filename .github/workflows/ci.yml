@@ -172,7 +172,7 @@ jobs:
 
       - name: Tear down E2E stack
         if: always()
-        run: docker compose down -v --remove-orphan
+        run: docker compose down -v --remove-orphans
       - name: Elasticsearch init logs on failure
         if: failure()
         run: |
