@@ -36,38 +36,38 @@ services:
       retries: 12
       start_period: 20s
 
-kafka-init:
-  image: apache/kafka:3.8.0
-  restart: "no"
-  depends_on:
-    kafka:
-      condition: service_healthy
-  entrypoint: ["/bin/bash", "-ec"]
-  command: |
-    echo "Waiting for Kafka..."
-    until /opt/kafka/bin/kafka-topics.sh \
-      --bootstrap-server kafka:29092 \
-      --list >/dev/null 2>&1; do
-      sleep 2
-    done
+  kafka-init:
+    image: apache/kafka:3.8.0
+    restart: "no"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-ec"]
+    command: |
+      echo "Waiting for Kafka..."
+      until /opt/kafka/bin/kafka-topics.sh \
+        --bootstrap-server kafka:29092 \
+        --list >/dev/null 2>&1; do
+        sleep 2
+      done
 
-    echo "Creating topics..."
+      echo "Creating topics..."
 
-    /opt/kafka/bin/kafka-topics.sh \
-      --bootstrap-server kafka:29092 \
-      --create --if-not-exists \
-      --topic raw.events \
-      --partitions 3 \
-      --replication-factor 1
+      /opt/kafka/bin/kafka-topics.sh \
+        --bootstrap-server kafka:29092 \
+        --create --if-not-exists \
+        --topic raw.events \
+        --partitions 3 \
+        --replication-factor 1
 
-    /opt/kafka/bin/kafka-topics.sh \
-      --bootstrap-server kafka:29092 \
-      --create --if-not-exists \
-      --topic raw.documents \
-      --partitions 3 \
-      --replication-factor 1
+      /opt/kafka/bin/kafka-topics.sh \
+        --bootstrap-server kafka:29092 \
+        --create --if-not-exists \
+        --topic raw.documents \
+        --partitions 3 \
+        --replication-factor 1
 
-    echo "Kafka topics ready."
+      echo "Kafka topics ready."
   elasticsearch:
     <<: *common
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
