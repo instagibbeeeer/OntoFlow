@@ -1,5 +1,6 @@
 fastapi==0.115.0
 uvicorn[standard]==0.30.0
 strawberry-graphql==0.240.0
+pydantic==2.8.2
 elasticsearch==8.11.0
 google-genai
