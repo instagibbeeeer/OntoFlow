@@ -3,6 +3,8 @@
 The scalar object models are generated from ontology/ontology.yaml. This file adds
 relationship resolvers and action mutations that execute via the ontology runtime.
 """
+import inspect
+
 import strawberry
 from typing import Optional, List
 from generated_types import Machine, Part, Order, Batch, QualityFinding, MaintenanceAction, EngineeringDocument
@@ -135,14 +137,38 @@ class RAGResponse:
     citations: List[Citation]
     context_object_ids: List[str]
 
-def machine_view(d): return MachineView(**{k:d.get(k) for k in MachineView.__annotations__})
-def part_view(d): return PartView(**{k:d.get(k) for k in PartView.__annotations__})
-def order_view(d): return OrderView(**{k:d.get(k) for k in OrderView.__annotations__})
-def batch_view(d): return BatchView(**{k:d.get(k) for k in BatchView.__annotations__})
-def finding_view(d): return QualityFindingView(**{k:d.get(k) for k in QualityFindingView.__annotations__})
-def maintenance_view(d): return MaintenanceActionView(**{k:d.get(k) for k in MaintenanceActionView.__annotations__})
-def document_view(d): return DocumentView(**{k:d.get(k) for k in DocumentView.__annotations__})
+import inspect
 
+def _build_view(cls, data):
+    params = inspect.signature(cls).parameters
+    return cls(**{
+        k: data.get(k)
+        for k in params
+        if k in data or k == "id"
+    })
+
+def machine_view(d):
+    return _build_view(MachineView, d)
+
+def part_view(d):
+    return _build_view(PartView, d)
+
+def order_view(d):
+    return _build_view(OrderView, d)
+
+def batch_view(d):
+    return _build_view(BatchView, d)
+
+def finding_view(d):
+    return _build_view(QualityFindingView, d)
+
+def maintenance_view(d):
+    return _build_view(MaintenanceActionView, d)
+
+def document_view(d):
+    return _build_view(DocumentView, d)
+
+    
 @strawberry.type
 class Query:
     @strawberry.field
