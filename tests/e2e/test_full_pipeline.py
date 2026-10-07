@@ -92,6 +92,19 @@ class FullPipelineE2E(unittest.TestCase):
             json={"query": query, "variables": {"id": self.batch}},
             timeout=15,
         )
+
+        print("\n========== TRAVERSAL RESPONSE ==========")
+        print("HTTP:", r.status_code)
+
+        try:
+            body = r.json()
+            print(json.dumps(body, indent=2))
+        except Exception:
+            print(r.text)
+            raise
+
+        print("==================================\n")
+
         self.assertEqual(r.status_code, 200, r.text)
         body = r.json()
         self.assertNotIn("errors", body, body)
@@ -107,6 +120,18 @@ class FullPipelineE2E(unittest.TestCase):
             json={"query": f"Why did batch {self.batch} fail quality inspection?", "dq_min": 0.75},
             timeout=30,
         )
+        print("\n========== RAG RESPONSE ==========")
+        print("HTTP:", r.status_code)
+
+        try:
+            body = r.json()
+            print(json.dumps(body, indent=2))
+        except Exception:
+            print(r.text)
+            raise
+
+        print("==================================\n")
+
         self.assertEqual(r.status_code, 200, r.text)
         body = r.json()
         self.assertIn(self.document, {c["id"] for c in body["citations"]})
@@ -119,6 +144,18 @@ class FullPipelineE2E(unittest.TestCase):
             json={"inputs": {"user": "e2e-test"}},
             timeout=10,
         )
+        print("\n========== FINDING RESPONSE ==========")
+        print("HTTP:", r.status_code)
+
+        try:
+            body = r.json()
+            print(json.dumps(body, indent=2))
+        except Exception:
+            print(r.text)
+            raise
+
+        print("==================================\n")
+
         self.assertEqual(r.status_code, 200, r.text)
         self.assertEqual(r.json()["status"], "acknowledged")
 
@@ -129,6 +166,17 @@ class FullPipelineE2E(unittest.TestCase):
                 params={"q": self.invalid_finding},
                 timeout=5,
             )
+            print("HTTP:", r.status_code)
+
+            try:
+                body = r.json()
+                print(json.dumps(body, indent=2))
+            except Exception:
+                print(r.text)
+                raise
+
+            print("==================================\n")
+            
             if not r.ok:
                 return False
             return r.json()["hits"]["total"]["value"] > 0
