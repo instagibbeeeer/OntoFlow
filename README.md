@@ -4,7 +4,8 @@ Ontology-as-Code, event-drivenindustrial data platform inspired by the architect
 
 The project follows the same core principle: production data should be connected through a shared simple semantic model rather than handled as isolated system-specific data.
 
-<img width="2741" height="1501" alt="graphviz (2)" src="https://github.com/user-attachments/assets/617e2c6e-87b0-4402-92e9-709b41e8840a" />
+<img width="1371" height="751" alt="graphviz (2)" src="https://github.com/user-attachments/assets/35b6038a-e403-4aba-81ad-c68c512c1121" />
+
 
 
 OntoFlow extends this idea with modern streaming and AI-oriented data architecture. Data from sources such as production systems, quality systems, maintenance applications and technical documents is ingested through Apache Kafka and processed using Apache Spark Structured Streaming. Data is persisted through a Delta Lake Bronze–Silver–Gold architecture, where raw records are preserved, validated and transformed into typed **ontology objects**.
