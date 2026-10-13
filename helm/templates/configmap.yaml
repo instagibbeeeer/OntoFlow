@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ontoflow-config
+data:
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.config.kafkaBootstrapServers | quote }}
+  KAFKA_TOPICS: {{ .Values.config.kafkaTopics | quote }}
+  ELASTICSEARCH_URL: {{ .Values.config.elasticsearchUrl | quote }}
+  LAKEHOUSE_ROOT: {{ .Values.config.lakehouseRoot | quote }}
+  CHECKPOINT_ROOT: {{ .Values.config.checkpointRoot | quote }}
+  S3_ENDPOINT: {{ .Values.config.s3Endpoint | quote }}
+  S3_PATH_STYLE_ACCESS: {{ .Values.config.s3PathStyleAccess | quote }}
+  S3_SSL_ENABLED: {{ .Values.config.s3SslEnabled | quote }}

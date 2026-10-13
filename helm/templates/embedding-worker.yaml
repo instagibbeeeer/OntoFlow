@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ontoflow-embedding-worker
+spec:
+  replicas: {{ .Values.embeddingWorker.replicas }}
+  selector:
+    matchLabels:
+      app: ontoflow-embedding-worker
+  template:
+    metadata:
+      labels:
+        app: ontoflow-embedding-worker
+    spec:
+      containers:
+        - name: worker
+          image: "{{ .Values.image.api.repository }}:{{ .Values.image.api.tag }}"
+          imagePullPolicy: {{ .Values.image.api.pullPolicy }}
+          command: ["python","embedding_worker.py"]
+          envFrom:
+            - configMapRef:
+                name: ontoflow-config
+            - secretRef:
+                name: ontoflow-secrets
+          resources:
+{{ toYaml .Values.embeddingWorker.resources | indent 12 }}

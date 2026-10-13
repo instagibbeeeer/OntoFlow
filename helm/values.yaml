@@ -1,0 +1,61 @@
+image:
+  api:
+    repository: ghcr.io/YOUR_GITHUB_USER/ontoflow-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  spark:
+    repository: ghcr.io/YOUR_GITHUB_USER/ontoflow-spark
+    tag: latest
+    pullPolicy: IfNotPresent
+
+api:
+  replicas: 3
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+
+embeddingWorker:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+config:
+  kafkaBootstrapServers: "kafka.example.internal:9092"
+  kafkaTopics: "raw.events,raw.documents"
+  elasticsearchUrl: "http://elasticsearch.example.internal:9200"
+  lakehouseRoot: "s3a://ontoflow/lakehouse"
+  checkpointRoot: "s3a://ontoflow/checkpoints"
+  s3Endpoint: ""
+  s3PathStyleAccess: "false"
+  s3SslEnabled: "true"
+
+secrets:
+  elasticsearchUsername: ""
+  elasticsearchPassword: ""
+  s3AccessKey: ""
+  s3SecretKey: ""
+  geminiApiKey: ""
+
+spark:
+  executorInstances: 4
+  executorCores: 2
+  executorMemory: 4g
+  driverCores: 1
+  driverMemory: 2g
