@@ -15,3 +15,5 @@ Elasticsearch provides structured filtering, full-text search and vector retriev
 OntoFlow also includes ontology-aware hybrid RAG, combining BM25 search, vector similarity and relationship traversal. This enables AI applications to retrieve not only documents containing matching words, but also connected engineering context such as the machine, batch, quality finding, maintenance action and technical documentation associated with a production issue.
 
 Technologies: Python, Apache Kafka, PySpark, Delta Lake, Elasticsearch, FastAPI, GraphQL, Docker.
+
+The project fully passes E2E tests on AWS Localstack.
