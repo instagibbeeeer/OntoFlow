@@ -12,7 +12,7 @@ bearer = HTTPBearer(auto_error=False)
 
 
 @lru_cache(maxsize=1)
-def _oidc_settings():
+def _oidc_settings(): 
     try:
         return (
             os.environ["OIDC_ISSUER"].rstrip("/"),
