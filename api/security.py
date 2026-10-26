@@ -3,9 +3,9 @@ import os
 from functools import lru_cache
 
 import jwt
+from jwt import PyJWKClient
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jwt import PyJWKClient
 
 bearer = HTTPBearer(auto_error=False)
 
@@ -27,7 +27,13 @@ def _oidc_settings():
 def _jwks_client():
     return PyJWKClient(_oidc_settings()[2], cache_jwk_set=True, lifespan=300)
 
-
+def _unauthorized(detail="Invalid access token"):
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=detail,
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
 
 def validate_token(token: str, required_scopes=()):
     issuer, audience, _ = _oidc_settings()
@@ -55,5 +61,11 @@ def validate_token(token: str, required_scopes=()):
         raise HTTPException(status_code=403, detail="Insufficient OAuth scopes")
     return claims
 
+def require_scopes(*required_scopes):
+    def dependency(credentials: HTTPAuthorizationCredentials = Depends(bearer)):
+        if credentials is None:
+            raise _unauthorized("Bearer token required")
+        return validate_token(credentials.credentials, required_scopes)
+    return dependency
 
 
