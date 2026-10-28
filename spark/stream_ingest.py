@@ -99,8 +99,18 @@ if es_url.scheme == "https":
         "spark.es.net.ssl", "true"
     )
 
-# to be extended for OAUTH
-if os.getenv("ELASTICSEARCH_USERNAME"):
+#security.protocol=SASL_SSL
+#sasl.mechanism=OAUTHBEARER
+
+# Use the secured production login callback handler
+#sasl.login.callback.handler.class=org.apache.kafka.common.security.oauthbearer.secured.OAuthBearerLoginCallbackHandler
+
+# Configure how the consumer fetches the token from the IdP
+#sasl.oauthbearer.token.endpoint.url=https://YOUR_IDP_DOMAIN/oauth2/v1/token
+#sasl.oauthbearer.client.id=your-consumer-client-id
+#sasl.oauthbearer.client.secret=your-consumer-client-secret
+#sasl.oauthbearer.scope=kafka-read-scope
+erif os.getenv("ELASTICSEARCH_USERNAME"):
     builder = builder.config(
         "spark.es.net.http.auth.user",
         os.environ["ELASTICSEARCH_USERNAME"]
