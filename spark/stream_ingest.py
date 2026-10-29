@@ -110,7 +110,7 @@ if es_url.scheme == "https":
 #sasl.oauthbearer.client.id=your-consumer-client-id
 #sasl.oauthbearer.client.secret=your-consumer-client-secret
 #sasl.oauthbearer.scope=kafka-read-scope
-erif os.getenv("ELASTICSEARCH_USERNAME"):
+if os.getenv("ELASTICSEARCH_USERNAME"):
     builder = builder.config(
         "spark.es.net.http.auth.user",
         os.environ["ELASTICSEARCH_USERNAME"]
