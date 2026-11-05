@@ -9,7 +9,14 @@ import strawberry
 from typing import Optional, List
 from generated_types import Machine, Part, Order, Batch, QualityFinding, MaintenanceAction, EngineeringDocument
 from repository import get_object, query_objects, traverse_link, apply_action, rag
+from graphql import GraphQLError
 
+def check_scope(info, scope):
+    claims = info.context["user"]
+    scopes = set(claims.get("scope", "").split())
+
+    if scope not in scopes:
+        raise GraphQLError(f"Missing permission: {scope}")
 
 def _make(cls, d):
     if not d: return None
