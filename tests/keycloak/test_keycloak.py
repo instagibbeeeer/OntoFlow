@@ -1,5 +1,6 @@
 from pathlib import Path
 import sys
+import os
 import requests
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
