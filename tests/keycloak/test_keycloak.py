@@ -4,6 +4,10 @@ import requests
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from api.security import validate_token
+issuer = os.getenv(
+    "OIDC_ISSUER",
+    "http://localhost:8080/realms/ontoflow-ci"
+)
 response = requests.post(
     f"{issuer}/protocol/openid-connect/token",
     data={
