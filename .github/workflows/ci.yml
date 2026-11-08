@@ -82,7 +82,7 @@ jobs:
           cache-from: type=gha,scope=spark
           cache-to: type=gha,mode=max,scope=spark
   
-  keycloak-tests:
+  keycloak-setup:
     name: keycloack
     runs-on: ubuntu-latest
 
