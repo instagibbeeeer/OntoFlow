@@ -9,18 +9,20 @@ issuer = os.getenv(
     "OIDC_ISSUER",
     "http://localhost:8080/realms/ontoflow-ci"
 )
-response = requests.post(
-    f"{issuer}/protocol/openid-connect/token",
-    data={
-        "grant_type": "client_credentials",
-        "client_id": "ci-client",
-        "client_secret": "ci-test-secret",
-    },
-)
-response.raise_for_status()
-token = response.json()["access_token"]
+def test_keycloak_jwks():
+    response = requests.post(
+        f"{issuer}/protocol/openid-connect/token",
+        data={
+            "grant_type": "client_credentials",
+            "client_id": "ci-client",
+            "client_secret": "ci-test-secret",
+        },
+        timeout=10,
+    )
 
-# Verify it using OntoFlow's real JWKS validation
-claims = validate_token(token, ("objects:read",))
+    response.raise_for_status()
+    token = response.json()["access_token"]
 
-assert "objects:read" in claims["scope"].split()
+    claims = validate_token(token, ("objects:read",))
+
+    assert "objects:read" in claims["scope"].split()
