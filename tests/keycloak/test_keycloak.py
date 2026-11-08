@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from api import validate_token
+from api.security import validate_token
 response = requests.post(
     f"{issuer}/protocol/openid-connect/token",
     data={
