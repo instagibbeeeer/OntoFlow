@@ -127,7 +127,7 @@ jobs:
           OIDC_AUDIENCE: ontoflow-api
           OIDC_JWKS_URL: http://localhost:8080/realms/ontoflow-ci/protocol/openid-connect/certs
         run: |
-          #python -m pytest -v tests/test_keycloak_integration.py
+          python -m pytest -v tests/test_keycloak_integration.py
 
 
   integration:
