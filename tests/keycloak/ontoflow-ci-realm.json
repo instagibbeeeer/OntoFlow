@@ -24,6 +24,15 @@
       }
     },
     {
+      "name": "rag:query",
+      "description": "CI test scope for OntoFlow:",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
+    },
+    {
       "name": "actions:execute",
       "description": "CI test scope for OntoFlow: actions:execute",
       "protocol": "openid-connect",
@@ -50,7 +59,9 @@
       "fullScopeAllowed": false,
       "defaultClientScopes": [
         "objects:read",
-        "link:traverse"
+        "link:traverse",
+        "rag:query",
+        "actions:execute"
       ],
       "protocolMappers": [
         {
