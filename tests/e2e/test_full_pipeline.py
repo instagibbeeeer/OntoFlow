@@ -9,6 +9,10 @@ from kafka import KafkaProducer
 API = os.getenv("ONTOFLOW_API_URL", "http://localhost:8000").rstrip("/")
 KAFKA = os.getenv("ONTOFLOW_KAFKA", "localhost:9092")
 ES = os.getenv("ONTOFLOW_ES_URL", "http://localhost:9200").rstrip("/")
+issuer = os.getenv(
+    "OIDC_ISSUER",
+    "http://localhost:8080/realms/ontoflow-ci"
+)
 response = requests.post(
     f"{issuer}/protocol/openid-connect/token",
     data={
@@ -45,7 +49,7 @@ class FullPipelineE2E(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         wait_for(
-            lambda: requests.get(f"{API}/health", timeout=3).ok,
+            lambda: requests.get(f"{API}/health", headers=headers,timeout=3).ok,
             "API health",
             timeout=90,
         )
@@ -105,6 +109,7 @@ class FullPipelineE2E(unittest.TestCase):
         r = requests.post(
             f"{API}/graphql",
             json={"query": query, "variables": {"id": self.batch}},
+            headers=headers,
             timeout=15,
         )
 
@@ -133,6 +138,7 @@ class FullPipelineE2E(unittest.TestCase):
         r = requests.post(
             f"{API}/rag",
             json={"query": f"Why did batch {self.batch} fail quality inspection?", "dq_min": 0.75},
+            headers=headers,
             timeout=30,
         )
         print("\n========== RAG RESPONSE ==========")
