@@ -84,13 +84,13 @@ class FullPipelineE2E(unittest.TestCase):
         producer.close()
 
         def batch_visible():
-            r = requests.get(f"{API}/objects/Batch/{cls.batch}", timeout=5)
+            r = requests.get(f"{API}/objects/Batch/{cls.batch}", headers=headers, timeout=5)
             return r.json() if r.status_code == 200 else None
 
         wait_for(batch_visible, "Kafka -> Spark -> Gold -> Elasticsearch batch", timeout=300)
 
         def document_visible():
-            r = requests.get(f"{API}/objects/EngineeringDocument/{cls.document}", timeout=5)
+            r = requests.get(f"{API}/objects/EngineeringDocument/{cls.document}", headers=headers, timeout=5)
             return r.json() if r.status_code == 200 else None
 
         wait_for(document_visible, "document indexing", timeout=180)
@@ -163,6 +163,7 @@ class FullPipelineE2E(unittest.TestCase):
         r = requests.post(
             f"{API}/actions/acknowledge_finding/{self.finding}",
             json={"inputs": {"user": "e2e-test"}},
+            headers=headers,
             timeout=10,
         )
         print("\n========== FINDING RESPONSE ==========")
