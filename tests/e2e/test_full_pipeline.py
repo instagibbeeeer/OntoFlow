@@ -9,7 +9,22 @@ from kafka import KafkaProducer
 API = os.getenv("ONTOFLOW_API_URL", "http://localhost:8000").rstrip("/")
 KAFKA = os.getenv("ONTOFLOW_KAFKA", "localhost:9092")
 ES = os.getenv("ONTOFLOW_ES_URL", "http://localhost:9200").rstrip("/")
+response = requests.post(
+    f"{issuer}/protocol/openid-connect/token",
+    data={
+        "grant_type": "client_credentials",
+        "client_id": "ci-client",
+        "client_secret": "ci-test-secret",
+    },
+    timeout=10,
+)
 
+response.raise_for_status()
+token = response.json()["access_token"]
+headers = {
+    "Authorization": f"Bearer {self.jwt_token}",
+    "Content-Type": "application/json" 
+}
 
 def wait_for(getter, description, timeout=240, interval=3):
     deadline = time.time() + timeout
