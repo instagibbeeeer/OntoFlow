@@ -26,7 +26,7 @@ response = requests.post(
 response.raise_for_status()
 token = response.json()["access_token"]
 headers = {
-    "Authorization": f"Bearer {self.jwt_token}",
+    "Authorization": f"Bearer {token}",
     "Content-Type": "application/json" 
 }
 
