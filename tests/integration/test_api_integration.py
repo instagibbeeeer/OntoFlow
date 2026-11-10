@@ -12,7 +12,29 @@ from ontoflow_sdk import OntoFlowClient  # noqa: E402
 
 API = os.getenv("ONTOFLOW_API_URL", "http://localhost:8000").rstrip("/")
 ES = os.getenv("ONTOFLOW_ES_URL", "http://localhost:9200").rstrip("/")
+API = os.getenv("ONTOFLOW_API_URL", "http://localhost:8000").rstrip("/")
+KAFKA = os.getenv("ONTOFLOW_KAFKA", "localhost:9092")
+ES = os.getenv("ONTOFLOW_ES_URL", "http://localhost:9200").rstrip("/")
+issuer = os.getenv(
+    "OIDC_ISSUER",
+    "http://localhost:8080/realms/ontoflow-ci"
+)
+response = requests.post(
+    f"{issuer}/protocol/openid-connect/token",
+    data={
+        "grant_type": "client_credentials",
+        "client_id": "ci-client",
+        "client_secret": "ci-test-secret",
+    },
+    timeout=10,
+)
 
+response.raise_for_status()
+token = response.json()["access_token"]
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json" 
+}
 
 def _put(index, doc_id, doc):
     r = requests.put(
@@ -131,6 +153,7 @@ class ApiIntegrationTest(unittest.TestCase):
         r = requests.post(
             f"{API}/graphql",
             json={"query": query, "variables": {"id": self.batch}},
+            headers=headers,
             timeout=10,
         )
         self.assertEqual(r.status_code, 200, r.text)
