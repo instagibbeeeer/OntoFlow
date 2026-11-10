@@ -151,6 +151,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r api/requirements.txt
           python -m pip install requests kafka-python
+      - name: Start Keycloak
+        run: |
+          docker run -d \
+            --name keycloak-ci \
+            -p 127.0.0.1:8080:8080 \
+            -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+            -e KC_BOOTSTRAP_ADMIN_PASSWORD=ci-test-only \
+            -v "$PWD/tests/keycloak:/opt/keycloak/data/import:ro" \
+            quay.io/keycloak/keycloak:26.8.2 \
+            start-dev --import-realm
+
+      - name: Wait for Keycloak
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS \
+              http://localhost:8080/realms/ontoflow-ci/.well-known/openid-configuration \
+              > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs keycloak-ci
+          exit 1
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install pytest fastapi "PyJWT[crypto]" requests
 
       - name: Start Elasticsearch and API
         run: docker compose up -d --build elasticsearch elasticsearch-init api
@@ -160,6 +187,9 @@ jobs:
           ONTOFLOW_API_URL: http://localhost:8000
           ONTOFLOW_ES_URL: http://localhost:9200
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OIDC_ISSUER: http://localhost:8080/realms/ontoflow-ci
+          OIDC_AUDIENCE: ontoflow-api
+          OIDC_JWKS_URL: http://localhost:8080/realms/ontoflow-ci/protocol/openid-connect/certs
 
 
         run: python -m unittest discover -s tests/integration -p 'test_*.py' -v
