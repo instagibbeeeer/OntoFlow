@@ -3,16 +3,16 @@ from pydantic import BaseModel
 from strawberry.fastapi import GraphQLRouter
 from generated_schema import schema
 from repository import get_object, query_objects, traverse_link, apply_action, rag
-#from security import require_scopes
+from security import require_scopes
 
 app=FastAPI(title='OntoFlow Ontology Platform',version='2.0')
 app.include_router(GraphQLRouter(schema),prefix='/graphql')
-#app.include_router(
-#    GraphQLRouter(strawberry.Schema(query=Query), context_getter=graphql_context),
-#    prefix="/graphql",
-#)
-#async def graphql_context(claims=Depends(require_scopes("objects:read"))):
-#    return {"user": claims}
+app.include_router(
+    GraphQLRouter(strawberry.Schema(query=Query), context_getter=graphql_context),
+    prefix="/graphql",
+)
+async def graphql_context(claims=Depends(require_scopes("objects:read"))):
+    return {"user": claims}
 
 
 
