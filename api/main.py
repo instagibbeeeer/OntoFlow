@@ -9,8 +9,7 @@ app=FastAPI(title='OntoFlow Ontology Platform',version='2.0')
 app.include_router(GraphQLRouter(schema),prefix='/graphql')
 app.include_router(
     GraphQLRouter(strawberry.Schema(query=Query), context_getter=graphql_context),
-    prefix="/graphql",
-)
+    prefix="/graphql")
 async def graphql_context(claims=Depends(require_scopes("objects:read"))):
     return {"user": claims}
 
