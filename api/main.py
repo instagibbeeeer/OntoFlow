@@ -7,11 +7,11 @@ import strawberry
 from generated_schema import Query, Mutation
 
 app=FastAPI(title='OntoFlow Ontology Platform',version='2.0')
+async def graphql_context(claims=Depends(require_scopes("objects:read"))):
+    return {"user": claims}
 app.include_router(
     GraphQLRouter(strawberry.Schema(query=Query, mutation=Mutation), context_getter=graphql_context),
     prefix="/graphql")
-async def graphql_context(claims=Depends(require_scopes("objects:read"))):
-    return {"user": claims}
 
 
 
