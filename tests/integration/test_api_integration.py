@@ -155,7 +155,18 @@ class ApiIntegrationTest(unittest.TestCase):
         auth.raise_for_status()
     
         token = auth.json()["access_token"]
-    
+        import jwt
+        
+        payload = jwt.decode(
+            token,
+            options={"verify_signature": False}
+        )
+        
+        print("ISSUER:", payload.get("iss"))
+        print("AUDIENCE:", payload.get("aud"))
+        print("SCOPES:", payload.get("scope"))
+        print("EXPIRES:", payload.get("exp"))
+        print("ALGORITHM:", jwt.get_unverified_header(token).get("alg"))
         query = """
         query($id: String!) {
           batch(id: $id) {
