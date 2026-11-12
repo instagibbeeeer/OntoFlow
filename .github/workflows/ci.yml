@@ -180,6 +180,14 @@ jobs:
           python -m pip install pytest fastapi "PyJWT[crypto]" requests
 
       - name: Start Elasticsearch and API
+        env:
+          ONTOFLOW_API_URL: http://localhost:8000
+          ONTOFLOW_ES_URL: http://localhost:9200
+          ONTOFLOW_KAFKA: localhost:9092
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OIDC_ISSUER: http://localhost:8080/realms/ontoflow-ci
+          OIDC_AUDIENCE: ontoflow-api
+          OIDC_JWKS_URL: http://keycloak:8080/realms/ontoflow-ci/protocol/openid-connect/certs
         run: docker compose up -d --build elasticsearch elasticsearch-init api
 
       - name: Run integration suite
