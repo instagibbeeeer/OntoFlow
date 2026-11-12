@@ -189,6 +189,7 @@ class ApiIntegrationTest(unittest.TestCase):
         self.assertEqual(r.status_code, 200, r.text)
         body = r.json()
         citation_ids = {c["id"] for c in body["citations"]}
+        print(body["answer"])
         self.assertIn(self.document, citation_ids)
         self.assertTrue(body["answer"])
 
