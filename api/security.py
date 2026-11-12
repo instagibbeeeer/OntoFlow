@@ -38,7 +38,7 @@ def _unauthorized(detail="Invalid access token"):
 def validate_token(token: str, required_scopes=()):
     issuer, audience, _ = _oidc_settings()
     for name in ("OIDC_ISSUER", "OIDC_AUDIENCE", "OIDC_JWKS_URL"):
-    print(name, "=", os.getenv(name))
+        print(name, "=", os.getenv(name))
 
     try:
         url = os.environ["OIDC_JWKS_URL"]
