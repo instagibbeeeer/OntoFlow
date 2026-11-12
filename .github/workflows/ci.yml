@@ -273,8 +273,26 @@ jobs:
 
           
       - name: Start complete OntoFlow stack
+        env:
+          ONTOFLOW_API_URL: http://localhost:8000
+          ONTOFLOW_ES_URL: http://localhost:9200
+          ONTOFLOW_KAFKA: localhost:9092
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OIDC_ISSUER: http://localhost:8080/realms/ontoflow-ci
+          OIDC_AUDIENCE: ontoflow-api
+          OIDC_JWKS_URL: http://keycloak:8080/realms/ontoflow-ci/protocol/openid-connect/certs
         run: docker compose up -d --build
-
+      - name: Connect Keycloak to OntoFlow network
+        run: |
+          API_CONTAINER=$(docker compose ps -q api)
+      
+          NETWORK=$(docker inspect "$API_CONTAINER" \
+            --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{end}}')
+      
+          docker network connect \
+            --alias keycloak \
+            "$NETWORK" \
+            keycloak-ci
       - name: Run full-pipeline E2E suite
         env:
           ONTOFLOW_API_URL: http://localhost:8000
