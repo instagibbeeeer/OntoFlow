@@ -6,7 +6,7 @@ import jwt
 from jwt import PyJWKClient
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-
+import urllib.request
 bearer = HTTPBearer(auto_error=False)
 
 
