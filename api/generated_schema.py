@@ -175,24 +175,24 @@ def document_view(d):
 @strawberry.type
 class Query:
     @strawberry.field
-    def machine(self,id:str)->Optional[MachineView]:
+    def machine(self, info: strawberry.Info,id:str)->Optional[MachineView]:
         check_scope(info, "objects:read")
         d=get_object('Machine',id); return machine_view(d) if d else None
     @strawberry.field
-    def batch(self,id:str)->Optional[BatchView]:
+    def batch(self, info: strawberry.Info,id:str)->Optional[BatchView]:
         check_scope(info, "objects:read")
         d=get_object('Batch',id); return batch_view(d) if d else None
     @strawberry.field
-    def quality_finding(self,id:str)->Optional[QualityFindingView]:
+    def quality_finding(self, info: strawberry.Info,id:str)->Optional[QualityFindingView]:
         check_scope(info, "objects:read")
         d=get_object('QualityFinding',id); return finding_view(d) if d else None
     @strawberry.field
-    def quality_findings(self,severity:Optional[str]=None,status:Optional[str]=None)->List[QualityFindingView]:
+    def quality_findings(self, info: strawberry.Info,severity:Optional[str]=None,status:Optional[str]=None)->List[QualityFindingView]:
         check_scope(info, "objects:read")
         f={k:v for k,v in {'severity':severity,'status':status}.items() if v is not None}
         return [finding_view(x) for x in query_objects('QualityFinding',f)]
     @strawberry.field
-    def rag(self,query:str,dq_min:Optional[float]=None)->RAGResponse:
+    def rag(self,query:str, info: strawberry.Info,dq_min:Optional[float]=None)->RAGResponse:
         check_scope(info, "rag:query")
         r=rag(query,dq_min)
         return RAGResponse(answer=r['answer'],citations=[Citation(**c) for c in r['citations']],context_object_ids=[f"{o.get('object_type')}:{o.get('id')}" for o in r['context']])
@@ -200,11 +200,11 @@ class Query:
 @strawberry.type
 class Mutation:
     @strawberry.mutation
-    def acknowledge_finding(self,id:str,user:str)->QualityFindingView:
+    def acknowledge_finding(self, info: strawberry.Info,id:str,user:str)->QualityFindingView:
         check_scope(info, "actions:execute")
         return finding_view(apply_action('acknowledge_finding',id,{'user':user}))
     @strawberry.mutation
-    def close_finding(self,id:str,user:str,resolution:str)->QualityFindingView:
+    def close_finding(self, info: strawberry.Info,id:str,user:str,resolution:str)->QualityFindingView:
         check_scope(info, "actions:execute")
         return finding_view(apply_action('close_finding',id,{'user':user,'resolution':resolution}))
 
