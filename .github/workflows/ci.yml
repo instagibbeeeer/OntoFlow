@@ -190,6 +190,18 @@ jobs:
           OIDC_JWKS_URL: http://keycloak:8080/realms/ontoflow-ci/protocol/openid-connect/certs
         run: docker compose up -d --build elasticsearch elasticsearch-init api
 
+      - name: Connect Keycloak to OntoFlow network
+        run: |
+          API_CONTAINER=$(docker compose ps -q api)
+      
+          NETWORK=$(docker inspect "$API_CONTAINER" \
+            --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{end}}')
+      
+          docker network connect \
+            --alias keycloak \
+            "$NETWORK" \
+            keycloak-ci
+
       - name: Run integration suite
         env:
           ONTOFLOW_API_URL: http://localhost:8000
