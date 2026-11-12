@@ -138,6 +138,10 @@ services:
       elasticsearch-init:
         condition: service_completed_successfully
     environment:
+      OIDC_ISSUER: ${OIDC_ISSUER}
+      OIDC_AUDIENCE: ${OIDC_AUDIENCE}
+      OIDC_JWKS_URL: ${OIDC_JWKS_URL}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
       ELASTICSEARCH_URL: http://elasticsearch:9200
     ports:
       - "${API_PORT:-8000}:8000"
