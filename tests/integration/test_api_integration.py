@@ -141,42 +141,46 @@ class ApiIntegrationTest(unittest.TestCase):
         self.assertEqual([x["finding_id"] for x in r.json()], [self.finding])
 
     def test_graphql_relationship_traversal(self):
-        
-       auth = requests.post(
-        f"{issuer}/protocol/openid-connect/token",
-        data={
-            "grant_type": "client_credentials",
-            "client_id": "ci-client",
-            "client_secret": "ci-test-secret",
-        },
-        timeout=10,
+        issuer = os.environ["OIDC_ISSUER"]
+    
+        auth = requests.post(
+            f"{issuer}/protocol/openid-connect/token",
+            data={
+                "grant_type": "client_credentials",
+                "client_id": "ci-client",
+                "client_secret": "ci-test-secret",
+            },
+            timeout=10,
         )
-     auth.raise_for_status()
-
-    token = auth.json()["access_token"]
-
-    query = """
-    query($id: String!) {
-      batch(id: $id) {
-        batchId
-        machine { machineId name }
-        qualityFindings { findingId severity status }
-      }
-    }
-    """
-
-    r = requests.post(
-        f"{API}/graphql",
-        json={"query": query, "variables": {"id": self.batch}},
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=10,
-    )
+        auth.raise_for_status()
+    
+        token = auth.json()["access_token"]
+    
+        query = """
+        query($id: String!) {
+          batch(id: $id) {
+            batchId
+            machine { machineId name }
+            qualityFindings { findingId severity status }
+          }
+        }
+        """
+    
+        r = requests.post(
+            f"{API}/graphql",
+            json={"query": query, "variables": {"id": self.batch}},
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=10,
+        )
+    
         self.assertEqual(r.status_code, 200, r.text)
         body = r.json()
         self.assertNotIn("errors", body, body)
-        batch = body["data"]["batch"]
-        self.assertEqual(batch["machine"]["machineId"], self.machine)
-        self.assertEqual(batch["qualityFindings"][0]["findingId"], self.finding)
+        self.assertEqual(body["data"]["batch"]["machine"]["machineId"], self.machine)
+        self.assertEqual(
+            body["data"]["batch"]["qualityFindings"][0]["findingId"],
+            self.finding,
+        )
 
     def test_sdk_and_action_audit(self):
         client = OntoFlowClient(API)
