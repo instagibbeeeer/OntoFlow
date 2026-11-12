@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from strawberry.fastapi import GraphQLRouter
-from generated_schema import schema
 from repository import get_object, query_objects, traverse_link, apply_action, rag
 from security import require_scopes
 import strawberry
