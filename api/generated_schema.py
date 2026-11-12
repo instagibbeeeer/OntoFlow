@@ -212,4 +212,3 @@ class Mutation:
         #check_scope(info, "actions:execute")
         return finding_view(apply_action('close_finding',id,{'user':user,'resolution':resolution}))
 
-schema=strawberry.Schema(query=Query,mutation=Mutation)
