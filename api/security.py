@@ -37,6 +37,17 @@ def _unauthorized(detail="Invalid access token"):
 
 def validate_token(token: str, required_scopes=()):
     issuer, audience, _ = _oidc_settings()
+    for name in ("OIDC_ISSUER", "OIDC_AUDIENCE", "OIDC_JWKS_URL"):
+    print(name, "=", os.getenv(name))
+
+    try:
+        url = os.environ["OIDC_JWKS_URL"]
+        with urllib.request.urlopen(url, timeout=5) as response:
+            keys = json.load(response)
+            print("JWKS reachable:", response.status)
+            print("Available key IDs:", [k.get("kid") for k in keys["keys"]])
+    except Exception as exc:
+        print("JWKS ERROR:", type(exc).__name__, str(exc))
     try:
         signing_key = _jwks_client().get_signing_key_from_jwt(token)
         claims = jwt.decode(
