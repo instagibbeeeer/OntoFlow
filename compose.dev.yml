@@ -8,6 +8,13 @@ services:
     volumes:
       - ./api:/app
 
+
+
+
+
+
+
+
   spark-stream:
     volumes:
       - ./spark:/app
